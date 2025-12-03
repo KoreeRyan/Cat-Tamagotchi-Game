@@ -10,9 +10,11 @@ public class Cat {
 
     //State
     private boolean isSleeping;
-    private Instant lastInteractionTime = Instant.now();
+    private boolean gameOver;
+    private Instant lastInteractionTime;
     private Instant sleepStartTime;
     private Instant lastHappinessDecayTime;
+
 
 
 
@@ -23,10 +25,14 @@ public class Cat {
         this.cleanliness = 100;
         this.lastInteractionTime = Instant.now();
         this.isSleeping = false;
+        this.gameOver = false;
         this.sleepStartTime = null;
     }
 
     public void feed() {
+        if (gameOver) {
+            return;
+        }
         if (isSleeping) {
             if (energy == 0) {
                 return;
@@ -45,9 +51,14 @@ public class Cat {
         happiness = clampStat(happiness);
         energy = clampStat(energy);
         cleanliness = clampStat(cleanliness);
+
+        checkGameOver();
     }
 
     public void play() {
+        if (gameOver) {
+            return;
+        }
         if (isSleeping) {
             if (energy == 0) {
                 return;
@@ -74,9 +85,14 @@ public class Cat {
         energy = clampStat(energy);
         cleanliness = clampStat(cleanliness);
 
+        checkGameOver();
+
     }
 
     public void clean() {
+        if (gameOver) {
+            return;
+        }
         if (isSleeping) {
             if (energy == 0) {
                 return;
@@ -93,10 +109,16 @@ public class Cat {
         happiness = clampStat(happiness);
         energy = clampStat(energy);
         cleanliness = clampStat(cleanliness);
+
+        checkGameOver();
     }
 
     public void updateStatus() {
         Instant now = Instant.now();
+
+        if (gameOver) {
+            return;
+        }
 
         //1) Wake up from exhaustion sleep after 5 minutes
         if (isSleeping && energy == 0 && sleepStartTime != null) {
@@ -136,6 +158,7 @@ public class Cat {
             lastHappinessDecayTime = null;
         }
 
+         checkGameOver();
     }
 
 
@@ -157,6 +180,20 @@ public class Cat {
 
     public boolean isSleeping() {
         return isSleeping;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    private void checkGameOver() {
+        if (fullness == 0 || happiness == 0) {
+            fullness = 0;
+            happiness = 0;
+            energy = 0;
+            cleanliness = 0;
+            gameOver = true;
+        }
     }
 
     //Helper to keep stats between 0 and 100

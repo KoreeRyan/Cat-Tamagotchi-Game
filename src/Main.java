@@ -1,7 +1,196 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
+public class Main extends Application {
+
+    private Cat cat;
+
+    private Label fullnessLabel;
+    private Label happinessLabel;
+    private Label energyLabel;
+    private Label cleanlinessLabel;
+    private Label sleepLabel;
+    private Label catArtLabel;
+    private Label moodLabel;
+    private Label warningLabel;
+    private Button feedButton;
+    private Button playButton;
+    private Button cleanButton;
+    private Button startOverButton;
+    private Timeline gameLoop;
+
+    @Override
+    public void start(Stage primaryStage) {
+
+        cat = new Cat();
+
+        catArtLabel = new Label();
+        catArtLabel.setStyle("-fx-font-family: 'Monospaced'; -fx-font-size: 16;");
+
+        moodLabel = new Label();
+        warningLabel = new Label();
+
+        fullnessLabel = new Label();
+        happinessLabel = new Label();
+        energyLabel = new Label();
+        cleanlinessLabel = new Label();
+        sleepLabel = new Label();
+
+        feedButton = new Button("Feed");
+        playButton = new Button("Play");
+        cleanButton = new Button("Clean");
+        startOverButton = new Button("Start Over");
+
+        feedButton.setOnAction(event -> {
+            cat.feed();
+            updateLabels();
+        });
+
+        playButton.setOnAction(event -> {
+            cat.play();
+            updateLabels();
+        });
+
+        cleanButton.setOnAction(event -> {
+            cat.clean();
+            updateLabels();
+        });
+
+        startOverButton.setOnAction(event -> {
+            resetGame();
+        });
+
+        VBox root = new VBox(10);
+        root.getChildren().addAll(
+                catArtLabel,
+                moodLabel,
+                warningLabel,
+                fullnessLabel,
+                happinessLabel,
+                energyLabel,
+                cleanlinessLabel,
+                sleepLabel,
+                feedButton,
+                playButton,
+                cleanButton,
+                startOverButton
+        );
+
+        updateLabels();
+
+        gameLoop = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    cat.updateStatus();
+                    updateLabels();
+                    if (cat.isGameOver()) {
+                        gameLoop.stop();
+                    }
+                })
+
+        );
+        gameLoop.setCycleCount(Timeline.INDEFINITE);
+        gameLoop.play();
+
+        Scene scene = new Scene(root, 300, 300);
+        primaryStage.setTitle("Cat Tamagotchi");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void updateLabels() {
+        //Stats
+        fullnessLabel.setText("Fullness: " + cat.getFullness());
+        happinessLabel.setText("Happiness: " + cat.getHappiness());
+        energyLabel.setText("Energy: " + cat.getEnergy());
+        cleanlinessLabel.setText("Cleanliness: " + cat.getCleanliness());
+
+        //Status + ASCII cat + mood + warnings
+        if (cat.isGameOver()) {
+            //Game over View
+            sleepLabel.setText("Status: Game Over");
+
+            //Dead/tired cat
+            String art = " /\\_/\\\n( x_x )\n > ^ <";
+            catArtLabel.setText(art);
+
+            moodLabel.setText("Game over: your cat has left. . .");
+            warningLabel.setText("Fullness or happiness reached 0.");
+
+            //Disable buttons so player can't keep interacting
+            feedButton.setDisable(true);
+            playButton.setDisable(true);
+            cleanButton.setDisable(true);
+
+        } else {
+
+            sleepLabel.setText(cat.isSleeping() ? "Status: Sleeping" : "Status: Awake");
+
+            // ASCII cat based on sleep + happiness
+            String art;
+            if (cat.isSleeping()) {
+                art = " /\\_/\\\n( -.- ) zZ\n > ^ <";
+                moodLabel.setText("Your cat is sleeping.");
+            } else {
+                if (cat.getHappiness() >= 50) {
+                    art = " /\\_/\\\n( o.o )\n > ^ <";
+                    moodLabel.setText("Your cat is happy.");
+                } else {
+                    art = " /\\_/\\\n( -.- )\n > ^ <";
+                    moodLabel.setText("Your cat is unhappy.");
+                }
+            }
+
+            catArtLabel.setText(art);
+
+// Warning label based on low stats
+            if (cat.getFullness() <= 30 && cat.getHappiness() <= 30) {
+                warningLabel.setText("Warning: Your cat is very hungry and very unhappy!");
+            } else if (cat.getFullness() <= 30) {
+                warningLabel.setText("Warning: Your cat is very hungry.");
+            } else if (cat.getHappiness() <= 30) {
+                warningLabel.setText("Warning: Your cat is very unhappy.");
+            } else {
+                warningLabel.setText("");
+            }
+
+            //Buttons enabled during play
+            feedButton.setDisable(false);
+            playButton.setDisable(false);
+            cleanButton.setDisable(false);
+
+        }
+    }
+
+    private void resetGame() {
+
+
+        cat = new Cat();
+
+        feedButton.setDisable(false);
+        playButton.setDisable(false);
+        cleanButton.setDisable(false);
+
+        updateLabels();
+
+        if (gameLoop != null) {
+            gameLoop.playFromStart();
+        }
 
     }
+
+    public static void main(String[] args) {
+        launch(args);
     }
+}
+
+
+
+
+
