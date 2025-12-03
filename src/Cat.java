@@ -21,7 +21,7 @@ public class Cat {
         this.happiness = 50;
         this.energy = 100;
         this.cleanliness = 100;
-
+        this.lastInteractionTime = Instant.now();
         this.isSleeping = false;
         this.sleepStartTime = null;
     }
@@ -99,11 +99,67 @@ public class Cat {
         Instant now = Instant.now();
 
         //1) Wake up from exhaustion sleep after 5 minutes
-        if (isSleeping) {
-            if (energy == 0) {}
+        if (isSleeping && energy == 0 && sleepStartTime != null) {
+            // 5 minutes = 5 * 60 seconds
+            Instant wakeTime = sleepStartTime.plusSeconds(5 * 60);
+            if (now.isAfter(wakeTime) || now.equals(wakeTime)) {
+                energy = 75;
+                isSleeping = false;
+                sleepStartTime = null;
+            }
         }
+
+        //2) Fall asleep from idleness after 10 minutes (only if awake)
+        if (!isSleeping && lastInteractionTime != null) {
+            // 10 minutes = 10 * 60 seconds
+            Instant idleSleepTime = lastInteractionTime.plusSeconds(10 * 60);
+            if (now.isAfter(idleSleepTime) || now.equals(idleSleepTime)) {
+                isSleeping = true;
+                sleepStartTime = now;
+            }
+
+        }
+
+        //3) Happiness decay when cleanliness is 0 (1 point every 5 seconds)
+        if (cleanliness == 0) {
+            if (lastHappinessDecayTime == null) {
+                lastHappinessDecayTime = now;
+            } else {
+                Instant nextDecayTime = lastHappinessDecayTime.plusSeconds(5);
+                if (now.isAfter(nextDecayTime) || now.equals(nextDecayTime)) {
+                    happiness -= 1;
+                    happiness = clampStat(happiness);
+                    lastHappinessDecayTime = now;
+                }
+            }
+        } else {
+            lastHappinessDecayTime = null;
+        }
+
     }
-        //Helper to keep stats between 0 and 100
+
+
+    public int getFullness() {
+        return fullness;
+    }
+
+    public int getHappiness() {
+        return happiness;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public int getCleanliness() {
+        return cleanliness;
+    }
+
+    public boolean isSleeping() {
+        return isSleeping;
+    }
+
+    //Helper to keep stats between 0 and 100
     private int clampStat(int value) {
         if (value < 0) {
             return 0;
