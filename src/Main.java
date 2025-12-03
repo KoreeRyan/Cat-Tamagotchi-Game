@@ -138,9 +138,13 @@ public class Main extends Application {
                 art = " /\\_/\\\n( -.- ) zZ\n > ^ <";
                 moodLabel.setText("Your cat is sleeping.");
             } else {
-                if (cat.getHappiness() >= 50) {
+                int h = cat.getHappiness();
+                if (h>= 70) {
                     art = " /\\_/\\\n( o.o )\n > ^ <";
                     moodLabel.setText("Your cat is happy.");
+                } else if (h >= 40) {
+                    art = " /\\_/\\\n( -.- )\n > ^ <";
+                    moodLabel.setText("Your cat feels okay.");
                 } else {
                     art = " /\\_/\\\n( -.- )\n > ^ <";
                     moodLabel.setText("Your cat is unhappy.");
