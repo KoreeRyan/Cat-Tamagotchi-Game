@@ -1,3 +1,4 @@
+import java.time.Duration;
 import java.time.Instant;
 
 public class Cat {
@@ -29,6 +30,7 @@ public class Cat {
         this.sleepStartTime = null;
     }
 
+
     public void feed() {
         if (gameOver) {
             return;
@@ -44,7 +46,16 @@ public class Cat {
 
         fullness = 100;
         cleanliness -= 20;
-        energy = (energy + 100) / 2;
+        energy += 25;
+        lastInteractionTime = Instant.now();
+
+
+        if (energy <= 0) {
+            energy = 0;
+            isSleeping = true;
+            sleepStartTime = Instant.now();
+        }
+
         lastInteractionTime = Instant.now();
 
         fullness = clampStat(fullness);
@@ -120,22 +131,27 @@ public class Cat {
             return;
         }
 
-        //1) Wake up from exhaustion sleep after 5 minutes
+        //1) Wake up from exhaustion sleep after 5 seconds
         if (isSleeping && energy == 0 && sleepStartTime != null) {
-            // 5 minutes = 5 * 60 seconds
-            Instant wakeTime = sleepStartTime.plusSeconds(5 * 60);
-            if (now.isAfter(wakeTime) || now.equals(wakeTime)) {
+            Instant wakeTime = sleepStartTime.plusSeconds(10);
+
+            if (now.isAfter(wakeTime)) {
                 energy = 75;
                 isSleeping = false;
                 sleepStartTime = null;
             }
+
         }
 
-        //2) Fall asleep from idleness after 10 minutes (only if awake)
-        if (!isSleeping && lastInteractionTime != null) {
-            // 10 minutes = 10 * 60 seconds
-            Instant idleSleepTime = lastInteractionTime.plusSeconds(10 * 60);
-            if (now.isAfter(idleSleepTime) || now.equals(idleSleepTime)) {
+        //2) Fall asleep from idleness after 10 seconds
+        if (!isSleeping && energy > 0 &&lastInteractionTime != null) {
+
+            if (Duration.between(lastInteractionTime, now).getSeconds() < 2) {
+                return;
+            }
+            Instant idleSleepTime = lastInteractionTime.plusSeconds(10);
+
+            if (now.isAfter(idleSleepTime))  {
                 isSleeping = true;
                 sleepStartTime = now;
             }
@@ -147,7 +163,7 @@ public class Cat {
             if (lastHappinessDecayTime == null) {
                 lastHappinessDecayTime = now;
             } else {
-                Instant nextDecayTime = lastHappinessDecayTime.plusSeconds(5);
+                Instant nextDecayTime = lastHappinessDecayTime.plusSeconds(1);
                 if (now.isAfter(nextDecayTime) || now.equals(nextDecayTime)) {
                     happiness -= 1;
                     happiness = clampStat(happiness);
@@ -184,6 +200,10 @@ public class Cat {
 
     public boolean isGameOver() {
         return gameOver;
+    }
+
+    public void resetInteractionTimer() {
+        lastInteractionTime = Instant.now();
     }
 
     private void checkGameOver() {

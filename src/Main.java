@@ -121,6 +121,7 @@ public class Main extends Application {
 
         );
         gameLoop.setCycleCount(Timeline.INDEFINITE);
+        cat.resetInteractionTimer();
         gameLoop.play();
 
         Scene scene = new Scene(root, 320, 380);
@@ -165,14 +166,14 @@ public class Main extends Application {
             String art;
             if (cat.isSleeping()) {
                 art = " /\\_/\\\n( -.- ) zZ\n > ^ <";
-                moodLabel.setText("Your cat is sleeping.");
+                moodLabel.setText("Your cat is exhausted or lacks attention.");
             } else {
                 int h = cat.getHappiness();
                 if (h>= 70) {
                     art = " /\\_/\\ \n( ^.^ )\n > ^ <";
                     moodLabel.setText("Your cat is happy.");
                 } else if (h >= 40) {
-                    art = " /\\_/\\\n( -.- )\n > ^ <";
+                    art = " /\\_/\\\n( o.o )\n > ^ <";
                     moodLabel.setText("Your cat feels okay.");
                 } else {
                     art = " /\\_/\\\n( -.- )\n > ^ <";
