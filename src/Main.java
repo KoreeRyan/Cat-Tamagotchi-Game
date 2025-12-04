@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import javafx.geometry.Pos;
 
 public class Main extends Application {
 
@@ -32,21 +33,39 @@ public class Main extends Application {
         cat = new Cat();
 
         catArtLabel = new Label();
-        catArtLabel.setStyle("-fx-font-family: 'Monospaced'; -fx-font-size: 16;");
+        catArtLabel.getStyleClass().add("cat-art");
 
         moodLabel = new Label();
+        moodLabel.getStyleClass().add("mood-label");
+
+
         warningLabel = new Label();
+        warningLabel.getStyleClass().add("warning-label");
 
         fullnessLabel = new Label();
+        fullnessLabel.getStyleClass().add("stat-label");
+
         happinessLabel = new Label();
+        happinessLabel.getStyleClass().add("stat-label");
+
         energyLabel = new Label();
+        energyLabel.getStyleClass().add("stat-label");
+
         cleanlinessLabel = new Label();
+        cleanlinessLabel.getStyleClass().add("stat-label");
+
         sleepLabel = new Label();
+        sleepLabel.getStyleClass().add("stat-label");
 
         feedButton = new Button("Feed");
         playButton = new Button("Play");
         cleanButton = new Button("Clean");
         startOverButton = new Button("Start Over");
+
+        feedButton.getStyleClass().add("cute-button");
+        playButton.getStyleClass().add("cute-button");
+        cleanButton.getStyleClass().add("cute-button");
+        startOverButton.getStyleClass().add("startover-button");
 
         feedButton.setOnAction(event -> {
             cat.feed();
@@ -67,8 +86,10 @@ public class Main extends Application {
             resetGame();
         });
 
-        VBox root = new VBox(10);
-        root.getChildren().addAll(
+        VBox card = new VBox(10);
+        card.getStyleClass().add("cat-card");
+        card.setAlignment(Pos.CENTER);
+        card.getChildren().addAll(
                 catArtLabel,
                 moodLabel,
                 warningLabel,
@@ -82,6 +103,10 @@ public class Main extends Application {
                 cleanButton,
                 startOverButton
         );
+
+        VBox root = new VBox();
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(card);
 
         updateLabels();
 
@@ -98,7 +123,12 @@ public class Main extends Application {
         gameLoop.setCycleCount(Timeline.INDEFINITE);
         gameLoop.play();
 
-        Scene scene = new Scene(root, 300, 300);
+        Scene scene = new Scene(root, 320, 380);
+
+        scene.getStylesheets().add(
+                getClass().getResource("/style/style.css").toExternalForm()
+        );
+
         primaryStage.setTitle("Cat Tamagotchi");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -113,7 +143,6 @@ public class Main extends Application {
 
         //Status + ASCII cat + mood + warnings
         if (cat.isGameOver()) {
-            //Game over View
             sleepLabel.setText("Status: Game Over");
 
             //Dead/tired cat
@@ -140,7 +169,7 @@ public class Main extends Application {
             } else {
                 int h = cat.getHappiness();
                 if (h>= 70) {
-                    art = " /\\_/\\\n( o.o )\n > ^ <";
+                    art = " /\\_/\\ \n( ^.^ )\n > ^ <";
                     moodLabel.setText("Your cat is happy.");
                 } else if (h >= 40) {
                     art = " /\\_/\\\n( -.- )\n > ^ <";
@@ -153,7 +182,6 @@ public class Main extends Application {
 
             catArtLabel.setText(art);
 
-// Warning label based on low stats
             if (cat.getFullness() <= 30 && cat.getHappiness() <= 30) {
                 warningLabel.setText("Warning: Your cat is very hungry and very unhappy!");
             } else if (cat.getFullness() <= 30) {

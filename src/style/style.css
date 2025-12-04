@@ -1,0 +1,8 @@
+.root {
+    -fx-background-color: hotpink;
+}
+
+.cat-art {
+    -fx-font-family: "Menlo", "Courier New", "Monospaced";
+    -fx-font-size: 20;
+}
