@@ -9,6 +9,8 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
 
+import java.util.Objects;
+
 public class Main extends Application {
 
     private Cat cat;
@@ -24,7 +26,6 @@ public class Main extends Application {
     private Button feedButton;
     private Button playButton;
     private Button cleanButton;
-    private Button startOverButton;
     private Timeline gameLoop;
 
     @Override
@@ -60,31 +61,29 @@ public class Main extends Application {
         feedButton = new Button("Feed");
         playButton = new Button("Play");
         cleanButton = new Button("Clean");
-        startOverButton = new Button("Start Over");
+        Button startOverButton = new Button("Start Over");
 
         feedButton.getStyleClass().add("cute-button");
         playButton.getStyleClass().add("cute-button");
         cleanButton.getStyleClass().add("cute-button");
         startOverButton.getStyleClass().add("startover-button");
 
-        feedButton.setOnAction(event -> {
+        feedButton.setOnAction(_ -> {
             cat.feed();
             updateLabels();
         });
 
-        playButton.setOnAction(event -> {
+        playButton.setOnAction(_ -> {
             cat.play();
             updateLabels();
         });
 
-        cleanButton.setOnAction(event -> {
+        cleanButton.setOnAction(_ -> {
             cat.clean();
             updateLabels();
         });
 
-        startOverButton.setOnAction(event -> {
-            resetGame();
-        });
+        startOverButton.setOnAction(_ -> resetGame());
 
         VBox card = new VBox(10);
         card.getStyleClass().add("cat-card");
@@ -111,7 +110,7 @@ public class Main extends Application {
         updateLabels();
 
         gameLoop = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> {
+                new KeyFrame(Duration.seconds(1), _ -> {
                     cat.updateStatus();
                     updateLabels();
                     if (cat.isGameOver()) {
@@ -127,7 +126,7 @@ public class Main extends Application {
         Scene scene = new Scene(root, 320, 380);
 
         scene.getStylesheets().add(
-                getClass().getResource("/style/style.css").toExternalForm()
+                Objects.requireNonNull(getClass().getResource("/style/style.css")).toExternalForm()
         );
 
         primaryStage.setTitle("Cat Tamagotchi");

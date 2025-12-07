@@ -2,7 +2,6 @@
 .root {
     -fx-background-color: #E6E6FA;
     -fx-padding: 20;
-    -fx-font-family: "Nunito", "Segoe UI", sans-serif;
 }
 
 .cat-card {
