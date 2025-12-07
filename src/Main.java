@@ -29,10 +29,11 @@ public class Main extends Application {
     private Timeline gameLoop;
 
     @Override
+    /* Stage */
     public void start(Stage primaryStage) {
 
         cat = new Cat();
-
+        //Set labels
         catArtLabel = new Label();
         catArtLabel.getStyleClass().add("cat-art");
 
@@ -58,6 +59,7 @@ public class Main extends Application {
         sleepLabel = new Label();
         sleepLabel.getStyleClass().add("stat-label");
 
+        //Buttons
         feedButton = new Button("Feed");
         playButton = new Button("Play");
         cleanButton = new Button("Clean");
@@ -68,6 +70,7 @@ public class Main extends Application {
         cleanButton.getStyleClass().add("cute-button");
         startOverButton.getStyleClass().add("startover-button");
 
+        //Event handlers.. Button Disabling
         feedButton.setOnAction(_ -> {
             cat.feed();
             updateLabels();
@@ -85,6 +88,7 @@ public class Main extends Application {
 
         startOverButton.setOnAction(_ -> resetGame());
 
+        //VBox for centered and stacked layout
         VBox card = new VBox(10);
         card.getStyleClass().add("cat-card");
         card.setAlignment(Pos.CENTER);
@@ -109,6 +113,7 @@ public class Main extends Application {
 
         updateLabels();
 
+        //Update loop
         gameLoop = new Timeline(
                 new KeyFrame(Duration.seconds(1), _ -> {
                     cat.updateStatus();
@@ -129,11 +134,13 @@ public class Main extends Application {
                 Objects.requireNonNull(getClass().getResource("/style/style.css")).toExternalForm()
         );
 
+        //Scene
         primaryStage.setTitle("Cat Tamagotchi");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+        //Update labels method
     private void updateLabels() {
         //Stats
         fullnessLabel.setText("Fullness: " + cat.getFullness());
@@ -168,7 +175,7 @@ public class Main extends Application {
                 moodLabel.setText("Your cat is exhausted or lacks attention.");
             } else {
                 int h = cat.getHappiness();
-                if (h>= 70) {
+                if (h >= 70) {
                     art = " /\\_/\\ \n( ^.^ )\n > ^ <";
                     moodLabel.setText("Your cat is happy.");
                 } else if (h >= 40) {
@@ -182,6 +189,7 @@ public class Main extends Application {
 
             catArtLabel.setText(art);
 
+            // Warning labels
             if (cat.getFullness() <= 30 && cat.getHappiness() <= 30) {
                 warningLabel.setText("Warning: Your cat is very hungry and very unhappy!");
             } else if (cat.getFullness() <= 30) {
@@ -200,6 +208,7 @@ public class Main extends Application {
         }
     }
 
+    //Reset
     private void resetGame() {
 
 
@@ -217,6 +226,7 @@ public class Main extends Application {
 
     }
 
+    //launch JavaFX program
     public static void main(String[] args) {
         launch(args);
     }

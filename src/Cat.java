@@ -18,7 +18,7 @@ public class Cat {
 
 
 
-
+    //Constructor
     public Cat() {
         this.fullness = 100;
         this.happiness = 50;
@@ -30,7 +30,7 @@ public class Cat {
         this.sleepStartTime = null;
     }
 
-
+    //Action methods
     public void feed() {
         if (gameOver) {
             return;
@@ -43,13 +43,13 @@ public class Cat {
 
             }
         }
-
+        //Feed logic
         fullness = 100;
         cleanliness -= 20;
         energy += 25;
         lastInteractionTime = Instant.now();
 
-
+        //if energy hits <= 0, trigger exhaustion sleep
         if (energy <= 0) {
             energy = 0;
             isSleeping = true;
@@ -58,6 +58,7 @@ public class Cat {
 
         lastInteractionTime = Instant.now();
 
+        //State clamp
         fullness = clampStat(fullness);
         happiness = clampStat(happiness);
         energy = clampStat(energy);
@@ -66,6 +67,7 @@ public class Cat {
         checkGameOver();
     }
 
+    //Play logic
     public void play() {
         if (gameOver) {
             return;
@@ -82,7 +84,7 @@ public class Cat {
         happiness += 25;
         energy -= 30;
 
-        //If energy hits 0 or below, trigger exhaustion sleep
+        //If energy hits <= 0, trigger exhaustion sleep
         if (energy <= 0) {
             energy = 0;
             isSleeping = true;
@@ -112,6 +114,7 @@ public class Cat {
             }
         }
 
+        //Does not affect energy
         happiness += 25;
         cleanliness = 100;
         lastInteractionTime = Instant.now();
@@ -124,6 +127,7 @@ public class Cat {
         checkGameOver();
     }
 
+    //called in gameLoop
     public void updateStatus() {
         Instant now = Instant.now();
 
@@ -131,7 +135,7 @@ public class Cat {
             return;
         }
 
-        //1) Wake up from exhaustion sleep after 5 seconds
+        //1) Can use buttons again and energy goes to 75 after exhaustion sleep
         if (isSleeping && energy == 0 && sleepStartTime != null) {
             Instant wakeTime = sleepStartTime.plusSeconds(10);
 
@@ -145,7 +149,10 @@ public class Cat {
 
         //2) Fall asleep from idleness after 10 seconds
         if (!isSleeping && energy > 0 &&lastInteractionTime != null) {
-
+            /*
+            needed to fix cat falling asleep immediately by taking
+            a grace period between lastInteractionTime updates
+            */
             if (Duration.between(lastInteractionTime, now).getSeconds() < 2) {
                 return;
             }
@@ -158,7 +165,7 @@ public class Cat {
 
         }
 
-        //3) Happiness decay when cleanliness is 0 (1 point every 5 seconds)
+        //3) Happiness decay when cleanliness is 0 (1 point every second)
         if (cleanliness == 0) {
             if (lastHappinessDecayTime == null) {
                 lastHappinessDecayTime = now;
@@ -177,7 +184,7 @@ public class Cat {
          checkGameOver();
     }
 
-
+    //Called in main class for labels
     public int getFullness() {
         return fullness;
     }
