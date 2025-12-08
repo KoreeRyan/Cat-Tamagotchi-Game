@@ -52,8 +52,7 @@ public class Main extends Application {
 
         // When Start is clicked, build the game UI and start the loop
         startButton.setOnAction(_ -> {
-            String name = nameField.getText().trim();
-            catName = name;
+            catName = nameField.getText().trim();
 
             Scene gameScene = createGameScene();
 
