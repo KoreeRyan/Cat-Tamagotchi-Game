@@ -8,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
 
 import java.util.Objects;
 
@@ -27,19 +28,64 @@ public class Main extends Application {
     private Button playButton;
     private Button cleanButton;
     private Timeline gameLoop;
+    private Label nameLabel;
+    private String catName;
+
+
 
     @Override
     /* Stage */
     public void start(Stage primaryStage) {
 
         cat = new Cat();
-        //Set labels
+// --- INTRO SCREEN (shows before the game starts) ---
+        Label introLabel = new Label("Name your cat:");
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter a name");
+        Button startButton = new Button("Start");
+
+        VBox introLayout = new VBox(10);
+        introLayout.setAlignment(Pos.CENTER);
+        introLayout.getChildren().addAll(introLabel, nameField, startButton);
+
+        Scene introScene = new Scene(introLayout, 320, 200);
+
+        // When Start is clicked, build the game UI and start the loop
+        startButton.setOnAction(_ -> {
+            String name = nameField.getText().trim();
+            catName = name;
+
+            Scene gameScene = createGameScene();
+
+            // Update loop
+            gameLoop = new Timeline(
+                    new KeyFrame(Duration.seconds(1), _ -> {
+                        cat.updateStatus();
+                        updateLabels();
+                        if (cat.isGameOver()) {
+                            gameLoop.stop();
+                        }
+                    })
+            );
+            gameLoop.setCycleCount(Timeline.INDEFINITE);
+            cat.resetInteractionTimer();
+            gameLoop.play();
+
+            primaryStage.setScene(gameScene);
+        });
+
+        primaryStage.setTitle("Cat Tamagotchi");
+        primaryStage.setScene(introScene);
+        primaryStage.show();
+    }
+
+    private Scene createGameScene() {
+        // Set labels
         catArtLabel = new Label();
         catArtLabel.getStyleClass().add("cat-art");
 
         moodLabel = new Label();
         moodLabel.getStyleClass().add("mood-label");
-
 
         warningLabel = new Label();
         warningLabel.getStyleClass().add("warning-label");
@@ -58,6 +104,10 @@ public class Main extends Application {
 
         sleepLabel = new Label();
         sleepLabel.getStyleClass().add("stat-label");
+
+        nameLabel = new Label();
+        nameLabel.getStyleClass().add("stat-label");
+
 
         //Buttons
         feedButton = new Button("Feed");
@@ -96,6 +146,7 @@ public class Main extends Application {
                 catArtLabel,
                 moodLabel,
                 warningLabel,
+                nameLabel,
                 fullnessLabel,
                 happinessLabel,
                 energyLabel,
@@ -134,14 +185,14 @@ public class Main extends Application {
                 Objects.requireNonNull(getClass().getResource("/style/style.css")).toExternalForm()
         );
 
-        //Scene
-        primaryStage.setTitle("Cat Tamagotchi");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+
+        return scene;
     }
 
         //Update labels method
     private void updateLabels() {
+        nameLabel.setText("Name: " + catName);
+
         //Stats
         fullnessLabel.setText("Fullness: " + cat.getFullness());
         happinessLabel.setText("Happiness: " + cat.getHappiness());
