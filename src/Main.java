@@ -38,7 +38,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         cat = new Cat();
-// --- INTRO SCREEN (shows before the game starts) ---
+    //INTRO SCREEN (shows before the game starts)
         Label introLabel = new Label("Name your cat:");
         TextField nameField = new TextField();
         nameField.setPromptText("Enter a name");
@@ -50,7 +50,7 @@ public class Main extends Application {
 
         Scene introScene = new Scene(introLayout, 320, 200);
 
-        // When Start is clicked, build the game UI and start the loop
+        // After start clicked, actual game UI and start the loop
         startButton.setOnAction(_ -> {
             catName = nameField.getText().trim();
 
@@ -66,6 +66,7 @@ public class Main extends Application {
                         }
                     })
             );
+
             gameLoop.setCycleCount(Timeline.INDEFINITE);
             cat.resetInteractionTimer();
             gameLoop.play();
@@ -162,21 +163,6 @@ public class Main extends Application {
         root.getChildren().addAll(card);
 
         updateLabels();
-
-        //Update loop
-        gameLoop = new Timeline(
-                new KeyFrame(Duration.seconds(1), _ -> {
-                    cat.updateStatus();
-                    updateLabels();
-                    if (cat.isGameOver()) {
-                        gameLoop.stop();
-                    }
-                })
-
-        );
-        gameLoop.setCycleCount(Timeline.INDEFINITE);
-        cat.resetInteractionTimer();
-        gameLoop.play();
 
         Scene scene = new Scene(root, 320, 380);
 
